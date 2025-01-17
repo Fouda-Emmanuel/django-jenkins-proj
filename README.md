@@ -85,6 +85,12 @@ pytest -v -rA
 # Home
 ![Screenshot](screenshots/home.png)
 
+# My Jobs
+![Screenshot](screenshots/myjobs.png)
+
+# My Applications
+![Screenshot](screenshots/myapplications.png)
+
 
 # Flower dashboard
 ![Screenshot](screenshots/flower.png)
