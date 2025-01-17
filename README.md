@@ -1,6 +1,8 @@
 # Django Recruit
 A Recruitment project built with Django
 
+## Starter template https://github.com/ridwanray/job-portal-templates
+
 # Tools & Services:
 - Django : Python Web Framework
 - Pytest: Testing Framework
