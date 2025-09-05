@@ -25,4 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/", include("accounts.urls")),
     path("adverts/", include("application_tracking.urls")),
-]+static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+]
+
+# Serve media only in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
