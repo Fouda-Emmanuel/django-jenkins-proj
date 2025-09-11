@@ -67,7 +67,7 @@ pipeline {
 
     post {
         success {
-            echo '🎉 SUCCESS: Tests + SonarQube analysis completed!'
+            echo '🎉 SUCCESS: Tests + SonarQube analysis completed!!'
         }
         failure {
             echo '❌ FAILURE: Something went wrong in the pipeline!'
