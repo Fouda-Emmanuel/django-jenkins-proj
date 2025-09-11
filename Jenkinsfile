@@ -22,17 +22,23 @@ pipeline {
         stage('Run Django Checks') {
             steps {
                 echo '⚙️ Running Django system checks in Docker...'
-                sh 'docker compose -f deploy.yml run --rm web python manage.py check'
+                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
+                    sh """
+                        docker compose -f deploy.yml --env-file \$ENV_FILE run --rm web python manage.py check
+                    """
+                }
             }
         }
 
         stage('Run Tests with Coverage') {
             steps {
                 echo '🧪 Running tests inside Docker...'
-                sh '''
-                    docker compose -f deploy.yml run --rm web \
-                    pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
-                '''
+                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
+                    sh """
+                        docker compose -f deploy.yml --env-file \$ENV_FILE run --rm web \
+                        pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
+                    """
+                }
             }
             post {
                 always {
@@ -46,18 +52,21 @@ pipeline {
             steps {
                 echo '🔍 Sending code analysis to SonarQube...'
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
-                        sonar-scanner \
-                          -Dsonar.projectKey=django_jobportal \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=http://localhost:9001 \
-                          -Dsonar.login=$SONARQUBE \
-                          -Dsonar.python.version=3.10 \
-                          -Dsonar.python.coverage.reportPaths=coverage.xml \
-                          -Dsonar.tests=accounts/tests,application_tracking/tests \
-                          -Dsonar.test.inclusions=**/test_*.py \
-                          -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
-                    '''
+                    withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
+                        sh """
+                            docker compose -f deploy.yml --env-file \$ENV_FILE run --rm web \
+                            sonar-scanner \
+                              -Dsonar.projectKey=django_jobportal \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=http://localhost:9001 \
+                              -Dsonar.login=$SONARQUBE \
+                              -Dsonar.python.version=3.10 \
+                              -Dsonar.python.coverage.reportPaths=coverage.xml \
+                              -Dsonar.tests=accounts/tests,application_tracking/tests \
+                              -Dsonar.test.inclusions=**/test_*.py \
+                              -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
+                        """
+                    }
                 }
             }
         }
