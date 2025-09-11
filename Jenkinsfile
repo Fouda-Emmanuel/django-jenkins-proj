@@ -23,10 +23,9 @@ pipeline {
                 echo '🐍 Setting up Python environment...'
                 sh '''
                     python -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    pip install pytest pytest-django coverage pytest-cov
+                    ./venv/bin/pip install --upgrade pip
+                    ./venv/bin/pip install -r requirements.txt
+                    ./venv/bin/pip install pytest pytest-django coverage pytest-cov
                 '''
             }
         }
@@ -35,8 +34,7 @@ pipeline {
             steps {
                 echo '⚙️ Running Django system checks...'
                 sh '''
-                    source venv/bin/activate
-                    python manage.py check
+                    ./venv/bin/python manage.py check
                 '''
             }
         }
@@ -45,8 +43,7 @@ pipeline {
             steps {
                 echo '🧪 Running tests with pytest & coverage...'
                 sh '''
-                    source venv/bin/activate
-                    pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
+                    ./venv/bin/pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
                 '''
             }
             post {
@@ -62,7 +59,6 @@ pipeline {
                 echo '🔍 Sending code analysis to SonarQube...'
                 withSonarQubeEnv('sonarqube') {
                     sh '''
-                        source venv/bin/activate
                         sonar-scanner \
                           -Dsonar.projectKey=django_jobportal \
                           -Dsonar.sources=. \
