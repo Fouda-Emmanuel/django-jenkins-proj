@@ -19,26 +19,29 @@ pipeline {
             }
         }
 
+        stage('Prepare Environment File') {
+            steps {
+                echo '📝 Copying Django env file to workspace...'
+                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
+                    sh 'cp $ENV_FILE .env'
+                }
+            }
+        }
+
         stage('Run Django Checks') {
             steps {
                 echo '⚙️ Running Django system checks in Docker...'
-                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
-                    sh """
-                        docker compose -f deploy.yml --env-file \$ENV_FILE run --rm web python manage.py check
-                    """
-                }
+                sh 'docker compose -f deploy.yml --env-file .env run --rm web python manage.py check'
             }
         }
 
         stage('Run Tests with Coverage') {
             steps {
                 echo '🧪 Running tests inside Docker...'
-                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
-                    sh """
-                        docker compose -f deploy.yml --env-file \$ENV_FILE run --rm web \
-                        pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
-                    """
-                }
+                sh '''
+                    docker compose -f deploy.yml --env-file .env run --rm web \
+                    pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
+                '''
             }
             post {
                 always {
@@ -52,21 +55,18 @@ pipeline {
             steps {
                 echo '🔍 Sending code analysis to SonarQube...'
                 withSonarQubeEnv('sonarqube') {
-                    withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
-                        sh """
-                            docker compose -f deploy.yml --env-file \$ENV_FILE run --rm web \
-                            sonar-scanner \
-                              -Dsonar.projectKey=django_jobportal \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=http://localhost:9001 \
-                              -Dsonar.login=\$SONARQUBE \
-                              -Dsonar.python.version=3.10 \
-                              -Dsonar.python.coverage.reportPaths=coverage.xml \
-                              -Dsonar.tests=accounts/tests,application_tracking/tests \
-                              -Dsonar.test.inclusions=**/test_*.py \
-                              -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
-                        """
-                    }
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=django_jobportal \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://localhost:9001 \
+                          -Dsonar.login=$SONARQUBE \
+                          -Dsonar.python.version=3.10 \
+                          -Dsonar.python.coverage.reportPaths=coverage.xml \
+                          -Dsonar.tests=accounts/tests,application_tracking/tests \
+                          -Dsonar.test.inclusions=**/test_*.py \
+                          -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
+                    '''
                 }
             }
         }
