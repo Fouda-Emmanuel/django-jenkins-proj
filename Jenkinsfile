@@ -31,7 +31,7 @@ pipeline {
         stage('Run Django Checks') {
             steps {
                 echo '⚙️ Running Django system checks in existing container...'
-                sh 'docker compose -f deploy.yml --env-file .env exec web python manage.py check'
+                sh 'docker exec -i django_jenkins_proj-web-1 python manage.py check'
             }
         }
 
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 echo '🧪 Running tests inside existing container...'
                 sh '''
-                    docker compose -f deploy.yml --env-file .env exec web \
+                    docker exec -i django_jenkins_proj-web-1 \
                     pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
                 '''
             }
