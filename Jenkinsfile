@@ -19,37 +19,20 @@ pipeline {
             }
         }
 
-        stage('Setup Python Environment') {
-            steps {
-                echo '🐍 Setting up Python environment...'
-                sh '''
-                    python -m venv venv
-                    ./venv/bin/pip install --upgrade pip
-                    ./venv/bin/pip install -r requirements.txt
-                    ./venv/bin/pip install pytest pytest-django coverage pytest-cov
-                '''
-            }
-        }
-
         stage('Run Django Checks') {
             steps {
-                echo '⚙️ Running Django system checks...'
-                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
-                    sh '''
-                        ./venv/bin/python manage.py check
-                    '''
-                }
+                echo '⚙️ Running Django system checks in Docker...'
+                sh 'docker compose -f deploy.yml run --rm web python manage.py check'
             }
         }
 
         stage('Run Tests with Coverage') {
             steps {
-                echo '🧪 Running tests with pytest & coverage...'
-                withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
-                    sh '''
-                        ./venv/bin/pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
-                    '''
-                }
+                echo '🧪 Running tests inside Docker...'
+                sh '''
+                    docker compose -f deploy.yml run --rm web \
+                    pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
+                '''
             }
             post {
                 always {
