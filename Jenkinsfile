@@ -7,7 +7,7 @@ pipeline {
                 echo 'Starting pipeline...'
                 git(
                     url: 'https://github.com/Fouda-Emmanuel/django-jenkins-proj.git',
-                    credentialsId: 'github-jenkins-token',
+                    credentialsId: 'github-username-pwd',
                     branch: 'main'
                 )
                 echo 'Code checkout completed!'
