@@ -23,7 +23,7 @@ pipeline {
                 echo '🐍 Setting up Python environment...'
                 sh '''
                     python -m venv venv
-                    source venv/bin/activate
+                    . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install pytest pytest-django coverage pytest-cov
