@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 echo '🚀 Checking out code from GitHub...'
@@ -35,11 +36,6 @@ pipeline {
                 echo '⚙️ Running Django system checks...'
                 withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
                     sh '''
-                        # Export all variables from the secret .env file
-                        set -o allexport
-                        . $ENV_FILE
-                        set +o allexport
-
                         ./venv/bin/python manage.py check
                     '''
                 }
@@ -51,10 +47,6 @@ pipeline {
                 echo '🧪 Running tests with pytest & coverage...'
                 withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
                     sh '''
-                        set -o allexport
-                        . $ENV_FILE
-                        set +o allexport
-
                         ./venv/bin/pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
                     '''
                 }
@@ -71,27 +63,22 @@ pipeline {
             steps {
                 echo '🔍 Sending code analysis to SonarQube...'
                 withSonarQubeEnv('sonarqube') {
-                    withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
-                        sh '''
-                            set -o allexport
-                            . $ENV_FILE
-                            set +o allexport
-
-                            sonar-scanner \
-                              -Dsonar.projectKey=django_jobportal \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=http://localhost:9001 \
-                              -Dsonar.login=$SONARQUBE \
-                              -Dsonar.python.version=3.10 \
-                              -Dsonar.python.coverage.reportPaths=coverage.xml \
-                              -Dsonar.tests=accounts/tests,application_tracking/tests \
-                              -Dsonar.test.inclusions=**/test_*.py \
-                              -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
-                        '''
-                    }
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=django_jobportal \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://localhost:9001 \
+                          -Dsonar.login=$SONARQUBE \
+                          -Dsonar.python.version=3.10 \
+                          -Dsonar.python.coverage.reportPaths=coverage.xml \
+                          -Dsonar.tests=accounts/tests,application_tracking/tests \
+                          -Dsonar.test.inclusions=**/test_*.py \
+                          -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
+                    '''
                 }
             }
         }
+
     }
 
     post {
