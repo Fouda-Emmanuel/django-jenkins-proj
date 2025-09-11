@@ -33,18 +33,18 @@ pipeline {
         stage('Run Django Checks') {
             steps {
                 echo '⚙️ Running Django system checks...'
-                sh '''
-                    ./venv/bin/python manage.py check
-                '''
+                withCredentials([string(credentialsId: 'django-secret-key', variable: 'SECRET_KEY')]) {
+                    sh './venv/bin/python manage.py check'
+                }
             }
         }
 
         stage('Run Tests with Coverage') {
             steps {
                 echo '🧪 Running tests with pytest & coverage...'
-                sh '''
-                    ./venv/bin/pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
-                '''
+                withCredentials([string(credentialsId: 'django-secret-key', variable: 'SECRET_KEY')]) {
+                    sh './venv/bin/pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml'
+                }
             }
             post {
                 always {
