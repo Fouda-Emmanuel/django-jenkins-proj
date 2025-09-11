@@ -37,7 +37,7 @@ pipeline {
                     sh '''
                         # Export all variables from the secret .env file
                         set -o allexport
-                        source $ENV_FILE
+                        . $ENV_FILE
                         set +o allexport
 
                         ./venv/bin/python manage.py check
@@ -52,7 +52,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
                     sh '''
                         set -o allexport
-                        source $ENV_FILE
+                        . $ENV_FILE
                         set +o allexport
 
                         ./venv/bin/pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
@@ -74,7 +74,7 @@ pipeline {
                     withCredentials([file(credentialsId: 'django-env-file', variable: 'ENV_FILE')]) {
                         sh '''
                             set -o allexport
-                            source $ENV_FILE
+                            . $ENV_FILE
                             set +o allexport
 
                             sonar-scanner \
