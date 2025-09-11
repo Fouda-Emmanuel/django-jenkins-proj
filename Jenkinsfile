@@ -24,7 +24,7 @@ pipeline {
         stage('Test Python') {
             steps {
                 echo 'Testing Python installation:'
-                sh 'python --version'
+                sh 'python3 --version'
                 sh 'pip --version'
             }
         }
