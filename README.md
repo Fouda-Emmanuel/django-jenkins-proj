@@ -67,33 +67,4 @@ Run tests in an activated virtualenv using:
 ```
 pytest -v -rA
 ```
-
-# Login
-![Screenshot](screenshots/login.png)
-
-
-# Register
-![Screenshot](screenshots/register-page.png.png)
-
-
-# Verify Account
-![Screenshot](screenshots/account-verification.png)
-
-
-# Reset password
-![Screenshot](screenshots/password-reset.png)
-
-
-# Home
-![Screenshot](screenshots/home.png)
-
-# My Jobs
-![Screenshot](screenshots/myjobs.png)
-
-# My Applications
-![Screenshot](screenshots/myapplications.png)
-
-
-# Flower dashboard
-![Screenshot](screenshots/flower.png)
-
+echo "# Test comment for Jenkins webhook - $(date)"
