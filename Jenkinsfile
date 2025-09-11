@@ -30,16 +30,16 @@ pipeline {
 
         stage('Run Django Checks') {
             steps {
-                echo '⚙️ Running Django system checks in Docker...'
-                sh 'docker compose -f deploy.yml --env-file .env run --rm web python manage.py check'
+                echo '⚙️ Running Django system checks in existing container...'
+                sh 'docker compose -f deploy.yml --env-file .env exec web python manage.py check'
             }
         }
 
         stage('Run Tests with Coverage') {
             steps {
-                echo '🧪 Running tests inside Docker...'
+                echo '🧪 Running tests inside existing container...'
                 sh '''
-                    docker compose -f deploy.yml --env-file .env run --rm web \
+                    docker compose -f deploy.yml --env-file .env exec web \
                     pytest -v -rA --cov=. --cov-report=xml --junitxml=test-results.xml
                 '''
             }
