@@ -39,14 +39,17 @@ pipeline {
             steps {
                 echo '🧪 Running tests inside existing container...'
                 sh '''
-                    docker exec -i django_jenkins_proj-web-1 \
-                    pytest -v -rA --junitxml=test-results.xml
+                    docker exec -i django_jenkins_proj-web-1 pytest -v -rA \
+                    --junitxml=/tmp/test-results.xml \
+                    --cov=./ \
+                    --cov-report=xml:/tmp/coverage.xml
                 '''
             }
             post {
                 always {
-                    junit 'test-results.xml'
-                    archiveArtifacts 'coverage.xml'
+                    echo '📄 Archiving test results and coverage report...'
+                    junit '/tmp/test-results.xml'
+                    archiveArtifacts '/tmp/coverage.xml'
                 }
             }
         }
@@ -61,8 +64,8 @@ pipeline {
                           -Dsonar.sources=. \
                           -Dsonar.host.url=http://localhost:9001 \
                           -Dsonar.login=$SONARQUBE \
-                          -Dsonar.python.version=3.10 \
-                          -Dsonar.python.coverage.reportPaths=coverage.xml \
+                          -Dsonar.python.version=3.12 \
+                          -Dsonar.python.coverage.reportPaths=/tmp/coverage.xml \
                           -Dsonar.tests=accounts/tests,application_tracking/tests \
                           -Dsonar.test.inclusions=**/test_*.py \
                           -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
