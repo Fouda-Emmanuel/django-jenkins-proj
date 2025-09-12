@@ -61,7 +61,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo '🔍 Sending code analysis to SonarQube...'
-                withSonarQubeEnv('sonarqube') {
+                withSonarQubeEnv('sonarqube-server') {
                     sh '''
                         sonar-scanner \
                           -Dsonar.projectKey=django_jobportal \
