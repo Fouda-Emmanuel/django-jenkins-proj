@@ -66,7 +66,7 @@ pipeline {
                         sonar-scanner \
                           -Dsonar.projectKey=django_jobportal \
                           -Dsonar.sources=. \
-                          -Dsonar.host.url=http://localhost:9001 \
+                          -Dsonar.host.url=http://localhost:9002 \
                           -Dsonar.login=$SONARQUBE \
                           -Dsonar.python.version=3.10 \
                           -Dsonar.python.coverage.reportPaths=coverage.xml \
