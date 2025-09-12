@@ -30,7 +30,7 @@ pipeline {
 
         stage('Run Django Checks') {
             steps {
-                echo '⚙️ Running Django system checks in existing container...'
+                echo '⚙️ Running Django system checks inside container...'
                 sh 'docker exec -i django_jenkins_proj-web-1 python manage.py check'
             }
         }
@@ -39,12 +39,10 @@ pipeline {
             steps {
                 echo '🧪 Running tests inside container with coverage...'
                 sh '''
-                    docker exec -i django_jenkins_proj-web-1 pytest -v -rA \
+                    docker exec -i django_jenkins_proj-web-1 pytest \
                         --junitxml=/tmp/test-results.xml \
-                        --cov=./ \
-                        --cov-report=xml:/tmp/coverage.xml
+                        --cov=./ --cov-report=xml:/tmp/coverage.xml
 
-                    # Copy test & coverage reports to Jenkins workspace
                     docker cp django_jenkins_proj-web-1:/tmp/test-results.xml .
                     docker cp django_jenkins_proj-web-1:/tmp/coverage.xml .
                 '''
