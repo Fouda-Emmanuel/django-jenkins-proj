@@ -39,9 +39,11 @@ pipeline {
             steps {
                 echo '🧪 Running tests inside container with coverage...'
                 sh '''
-                    docker exec -i django_jenkins_proj-web-1 pytest \
-                        --junitxml=/tmp/test-results.xml \
-                        --cov=./ --cov-report=xml:/tmp/coverage.xml
+                    docker exec -i django_jenkins_proj-web-1 sh -c "
+                        export COVERAGE_FILE=/tmp/.coverage && \
+                        pytest --junitxml=/tmp/test-results.xml \
+                               --cov=./ --cov-report=xml:/tmp/coverage.xml
+                    "
 
                     docker cp django_jenkins_proj-web-1:/tmp/test-results.xml .
                     docker cp django_jenkins_proj-web-1:/tmp/coverage.xml .
