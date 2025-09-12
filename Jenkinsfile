@@ -46,7 +46,7 @@ pipeline {
             post {
                 always {
                     junit 'test-results.xml'
-                    // archiveArtifacts 'coverage.xml'
+                    archiveArtifacts 'coverage.xml'
                 }
             }
         }
@@ -62,7 +62,7 @@ pipeline {
                           -Dsonar.host.url=http://localhost:9001 \
                           -Dsonar.login=$SONARQUBE \
                           -Dsonar.python.version=3.10 \
-                        //   -Dsonar.python.coverage.reportPaths=coverage.xml \
+                          -Dsonar.python.coverage.reportPaths=coverage.xml \
                           -Dsonar.tests=accounts/tests,application_tracking/tests \
                           -Dsonar.test.inclusions=**/test_*.py \
                           -Dsonar.exclusions=**/__pycache__/**,**/migrations/**,**/venv/**,**/static/**,**/media/**,**/screenshots/**,**/templates/**
